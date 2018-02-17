@@ -1,0 +1,47 @@
+body {
+	background-color: #FFFFFF;
+	font-family: Lucida Grande, Lucida Sans Unicode, Lucida Sans, DejaVu Sans, Verdana, sans-serif
+}
+a {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+div{
+	width: 412px;
+}
+table {
+	border-collapse: collapse;
+}
+table th{
+	text-align: left;
+	padding: 4px 30px 4px 8px;
+	color: white;
+	background-color: #2B5170;
+	border: 1px white solid;
+}
+table td {
+	border: 1px solid white;
+	padding: 4px 8px;
+	background-color: #B6CEE2;
+}
+table tr:nth-child(odd) td {
+	background-color: #6C9DC6;
+}
+td input {
+	width: 250px;
+}
+
+.exception, #exception1{
+	background-color: white;
+}
+#btn {
+	padding: 5px 10px;
+	float: right;
+	margin-top: 10px;
+}
+.header {
+	background-color: #A9C5DD;
+	border-radius: 8px;
+	width: 500px;
+	padding: 0.5em;
+}
