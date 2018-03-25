@@ -12,6 +12,7 @@ if ($cmd === "listPage") {
     $data['$selector'] = 1;
     add_contact($_POST["firstName"], $_POST["lastName"], $_POST["phone"]);
 }
+
 $data['$contacts'] = read_all_contacts();
 $data['$year'] = date('Y');
 print render_template("templates/main.html", $data);
