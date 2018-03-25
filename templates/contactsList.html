@@ -1,0 +1,10 @@
+<table>
+    <tr>
+        <th>Eesnimi</th>
+        <th>Perekonnanimi</th>
+        <th>Telefon</th>
+    </tr>
+    <tr tpl-foreach="$contacts as $contact">
+        <td tpl-foreach="$contact as $field">{{ $field }}</td>
+    </tr>
+</table><br>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Telefoni raamat</title>
+    <link href="/ProjektCSS.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div tpl-include="templates/header.html"></div>
+    <div tpl-if="$selector" tpl-include="templates/contactsList.html"></div>
+    <div tpl-if="!$selector" tpl-include="templates/addContact.html"></div>
+    <div tpl-include="templates/footer.html"></div>
+
+</body>
+</html>
