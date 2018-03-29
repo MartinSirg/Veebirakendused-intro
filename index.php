@@ -9,8 +9,9 @@ if ($cmd === "listPage") {
 } else if ($cmd === "addPage") {
     $data['$selector'] = 0;
 } else if ($cmd === "contactAdded") {
-    $data['$selector'] = 1;
     add_contact($_POST["firstName"], $_POST["lastName"], $_POST["phone"]);
+    header('Location: ?cmd=listPage');
+    return;
 }
 $data['$contacts'] = read_all_contacts();
 $data['$year'] = date('Y');
