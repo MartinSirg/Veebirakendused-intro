@@ -5,6 +5,14 @@
         <th>Telefon</th>
     </tr>
     <tr tpl-foreach="$contacts as $contact">
-        <td tpl-foreach="$contact as $field">{{ $field }}</td>
+        <td>
+            {{ $contact->firstName }}
+        </td>
+        <td>
+            {{ $contact->lastName }}
+        </td>
+        <td>
+            <p tpl-foreach="$contact->phones as $phone"> {{ $phone }}</p>
+        </td>
     </tr>
 </table><br>

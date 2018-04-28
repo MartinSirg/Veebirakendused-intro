@@ -31,6 +31,10 @@ td input {
 	width: 250px;
 }
 
+td p {
+	margin: 0px;
+}
+
 .exception, #exception1{
 	background-color: white;
 }
