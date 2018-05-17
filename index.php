@@ -2,42 +2,85 @@
 require_once("newFunctions.php");
 require_once("Contact.php");
 require_once("lib/tpl.php");
-$cmd = isset($_GET["cmd"]) ? $_GET["cmd"] : "listPage";
-$data = [];
+$cmd = isset($_GET["cmd"]) ? $_GET["cmd"] : "";
 if (isset($_GET["error"])) $data['$error'] = $_GET["error"];
 
 if ($cmd === "listPage") {
-    $data['$selector'] = 1;
-} else if ($cmd === "addPage") {
-    $data['$selector'] = 0;
-} else if ($cmd === "contactAdded") {
-//----------------------------------------INPUTI CONTROLLIMINE----------------------------------------------------------
-//    if (strlen($_POST["firstName"]) < 3 or strlen($_POST["firstName"]) > 15 ) {
-//        header('Location: ?cmd=addPage&error=Eesnimi+peab+olema+3+ja+15+tähemärgi+vahel');
-//    } elseif (strlen($_POST["lastName"]) < 3 or strlen($_POST["lastName"]) > 15 ) {
-//        header('Location: ?cmd=addPage&error=Perekonnanimi+peab+olema+3+ja+15+tähemärgi+vahel');
-//    } elseif (strlen($_POST["phone1"]) > 15 or strlen($_POST["phone2"]) > 15 or strlen($_POST["phone3"]) > 15) {
-//        header('Location: ?cmd=addPage&error=Telefoni+number+pikem+kui+15+tähemärki');
-//    } else {
-//        $phones["phone1"] = $_POST["phone1"];
-//        $phones["phone2"] = $_POST["phone2"];
-//        $phones["phone3"] = $_POST["phone3"];
-//        $contact = new Contact($_POST["firstName"], $_POST["lastName"], $phones);
-//        add_contact_sql($contact);
-//        header('Location: ?cmd=listPage');
-//        return;
-//    }
-//----------------------------------------------------------------------------------------------------------------------
-    $phones["phone1"] = $_POST["phone1"];
-    $phones["phone2"] = $_POST["phone2"];
-    $phones["phone3"] = $_POST["phone3"];
-    $contact = new Contact($_POST["firstName"], $_POST["lastName"], $phones);
-    add_contact_sql($contact);
-    header('Location: ?cmd=listPage');
-    return;
-} else {
-    header('Location: ?cmd=listPage');
+    print_json_data(read_all_contacts_sql());
+
+} else if ($cmd === "addPage") { // KONTAKTIDE LISAMINE
+    $input = json_decode(file_get_contents("php://input"));
+
+    if ($input != null) {
+        $errors = [];
+        $phones = isset($input->phones) ? $input->phones : [];
+
+        if (isset($input->firstName) == false or strlen($input->firstName) < 2) {
+            $errors[] = "Eesnimi on liiga lühike või ei eksisteeri";
+        }
+        if (isset($input->lastName) == false or strlen($input->lastName) < 2) {
+            $errors[] = "Perekonnanimi on liiga lühike või ei eksisteeri";
+        }
+        if (count($phones) === 0) {
+            $errors[] = "Sisesta vähemalt üks telefoninumber";
+        }
+
+        if (count($errors) > 0) {
+            $input->errors = $errors;
+            print_json_data($input);
+        } else {
+            print_json_data(add_contact_sql(new Contact($input->firstName, $input->lastName, $phones)));
+        }
+    }
+} else if ($cmd === "editContact") { // KONTAKTIDE MUUTMINE
+    if(isset($_GET["contactId"])) {
+        $id = $_GET["contactId"];
+        $input = json_decode(file_get_contents("php://input"));
+
+        if (get_contact_by_id2($id) == null) {
+            $error = new stdClass();
+            $error->error = "No such id in database";
+            print_json_data($error);
+
+        } else if ($input != null){
+
+            $errors = [];
+            $phones = isset($input->phones) ? $input->phones : [];
+
+            if (isset($input->firstName) == false or strlen($input->firstName) < 2) {
+                $errors[] = "Eesnimi on liiga lühike või ei eksisteeri";
+            }
+            if (isset($input->lastName) == false or strlen($input->lastName) < 2) {
+                $errors[] = "Perekonnanimi on liiga lühike või ei eksisteeri";
+            }
+            if (count($phones) === 0) {
+                $errors[] = "Sisesta vähemalt üks telefoninumber";
+            }
+
+            if (count($errors) > 0) {
+                $input->errors = $errors;
+                print_json_data($input);
+            } else {
+                print_json_data(edit_contact(new Contact($input->firstName, $input->lastName, $phones, $id)));
+            }
+
+        } else {
+            print_json_data(get_contact_by_id2($id));
+        }
+    } else {
+        $error = new stdClass();
+        $error->error = "Parameter contactId was not set in the URL";
+        print_json_data($error);
+    }
+} else { // ALGNE LEHT, EHK NIMEKIRJA VAADE
+    readfile("templates/main2.html");
 }
-$data['$contacts'] = read_all_contacts_sql();
-$data['$year'] = date('Y');
-print render_template("templates/main.html", $data);
+//$data['$contacts'] = read_all_contacts_sql();
+//$data['$year'] = date('Y');
+//print render_template("templates/main.html", $data);
+
+
+function print_json_data($data) {
+    header("Content-Type: application/json");
+    print json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+}

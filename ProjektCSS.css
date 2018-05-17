@@ -52,3 +52,31 @@ td p {
 form {
     margin-bottom: 60px;
 }
+#error-block {
+	background-color: rgba(180,0,1,0.50);
+	border-style: solid;
+	border-color: rgba(180,0,1,1);
+	border-radius: 5px;
+	margin-bottom: 15px;
+}
+#error-block p {
+	margin: 0;
+	padding-left: 10px;
+	font-size: 15px;
+}
+
+#success-block {
+	background-color: rgba(0, 180, 29, 0.74);
+	border-style: solid;
+	border-color: rgba(0,180,29,1);
+	border-radius: 5px;
+	margin-bottom: 15px;
+}
+#success-block p {
+	margin: 0;
+	padding-left: 10px;
+	font-size: 15px;
+}
+.firstName {
+	cursor: pointer;
+}
