@@ -7,9 +7,10 @@
 </head>
 <body>
     <div tpl-include="templates/header.html"></div>
-    <div tpl-if="$error"> {{ $error }} </div>
-    <div tpl-if="$selector" tpl-include="templates/contactsList.html"></div>
-    <div tpl-if="!$selector" tpl-include="templates/addContact.html"></div>
+    <div tpl-if="$displayErrors" id="error-block"><p tpl-foreach="$errors as $error">{{ $error }}</p></div>
+    <div tpl-if="$displayContacts" tpl-include="templates/contactsList.html"></div>
+    <div tpl-if="$displayAddPage" tpl-include="templates/addContact.html"></div>
+    <div tpl-if="$displayEditPage" tpl-include="templates/editContact.html"></div>
     <div tpl-include="templates/footer.html"></div>
 
 </body>
