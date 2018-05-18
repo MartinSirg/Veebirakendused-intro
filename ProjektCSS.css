@@ -52,3 +52,17 @@ td p {
 form {
     margin-bottom: 60px;
 }
+
+#error-block {
+	margin: 0 0 16px 0;
+	background-color: rgba(180, 0, 1, 0.51);
+	border-color: rgba(180,0,1,1);
+	border-style: solid;
+	width: 405px;
+}
+
+#error-block p {
+	margin: 0;
+	font-size: 16px;
+	padding-left: 10px;
+}

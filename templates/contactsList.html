@@ -6,7 +6,7 @@
     </tr>
     <tr tpl-foreach="$contacts as $contact">
         <td>
-            {{ $contact->firstName }}
+            <a href='?cmd=editPage&amp;contactID={{ $contact->id }}'>{{ $contact->firstName }}</a>
         </td>
         <td>
             {{ $contact->lastName }}

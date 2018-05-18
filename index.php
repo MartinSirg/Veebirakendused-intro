@@ -4,38 +4,92 @@ require_once("Contact.php");
 require_once("lib/tpl.php");
 $cmd = isset($_GET["cmd"]) ? $_GET["cmd"] : "listPage";
 $data = [];
-if (isset($_GET["error"])) $data['$error'] = $_GET["error"];
 
 if ($cmd === "listPage") {
-    $data['$selector'] = 1;
+    $data['$displayContacts'] = 1;
+    if (isset($_GET["error"])) {
+        $data['$displayErrors'] = 1;
+        if ($_GET["error"] === "1") $data['$errors'] = ["Isikut ei leitud andmebaasist"];
+        if ($_GET["error"] === "2") $data['$errors'] = ["Isikut ID parameetrit ei leitud URList"];
+    }
 } else if ($cmd === "addPage") {
-    $data['$selector'] = 0;
-} else if ($cmd === "contactAdded") {
-//----------------------------------------INPUTI CONTROLLIMINE----------------------------------------------------------
-//    if (strlen($_POST["firstName"]) < 3 or strlen($_POST["firstName"]) > 15 ) {
-//        header('Location: ?cmd=addPage&error=Eesnimi+peab+olema+3+ja+15+tähemärgi+vahel');
-//    } elseif (strlen($_POST["lastName"]) < 3 or strlen($_POST["lastName"]) > 15 ) {
-//        header('Location: ?cmd=addPage&error=Perekonnanimi+peab+olema+3+ja+15+tähemärgi+vahel');
-//    } elseif (strlen($_POST["phone1"]) > 15 or strlen($_POST["phone2"]) > 15 or strlen($_POST["phone3"]) > 15) {
-//        header('Location: ?cmd=addPage&error=Telefoni+number+pikem+kui+15+tähemärki');
-//    } else {
-//        $phones["phone1"] = $_POST["phone1"];
-//        $phones["phone2"] = $_POST["phone2"];
-//        $phones["phone3"] = $_POST["phone3"];
-//        $contact = new Contact($_POST["firstName"], $_POST["lastName"], $phones);
-//        add_contact_sql($contact);
-//        header('Location: ?cmd=listPage');
-//        return;
-//    }
-//----------------------------------------------------------------------------------------------------------------------
-    $phones["phone1"] = $_POST["phone1"];
-    $phones["phone2"] = $_POST["phone2"];
-    $phones["phone3"] = $_POST["phone3"];
-    $contact = new Contact($_POST["firstName"], $_POST["lastName"], $phones);
-    add_contact_sql($contact);
-    header('Location: ?cmd=listPage');
-    return;
-} else {
+    $data['$displayAddPage'] = 1;
+
+    if (isset($_POST["firstName"]) and isset($_POST["lastName"]) and isset($_POST["phone1"])
+        and isset($_POST["phone1"]) and isset($_POST["phone1"]) ) {
+        $errors = [];
+
+        if (strlen($_POST["firstName"]) < 2) {
+            $errors[] = "Eesnimi on liiga lühike.";
+        }
+        if (strlen($_POST["lastName"]) < 2) {
+            $errors[] = "Perekonnanimi on liiga lühike";
+        }
+        if (count($errors) > 0) {
+            $data['$displayErrors'] = 1;
+            $data['$errors'] = $errors;
+            $data['$input'] = [$_POST["firstName"], $_POST["lastName"], $_POST["phone1"],$_POST["phone2"], $_POST["phone3"]];
+
+        } else {
+            $phones = [];
+            $phones["phone1"] = $_POST["phone1"];
+            $phones["phone2"] = $_POST["phone2"];
+            $phones["phone3"] = $_POST["phone3"];
+            $contact = new Contact($_POST["firstName"], $_POST["lastName"], $phones);
+            add_contact_sql($contact);
+            header('Location: ?cmd=listPage');
+        }
+    } else {
+        $input = ["", "", "", "", ""];
+        $data['$input'] = $input;
+    }
+} else if ($cmd === "editPage") {
+    $data['$displayEditPage'] = 1;
+    if (isset($_GET["contactID"])) { // If contactID is set as GET parameter
+        $person = get_contact_by_id($_GET["contactID"]);
+        if ($person != null) { //If person exists in database
+            if (isset($_POST["firstName"]) and isset($_POST["lastName"]) and isset($_POST["phone1"])
+                and isset($_POST["phone1"]) and isset($_POST["phone1"]) ) { // Receiving post request for editing
+                $errors = [];
+
+                if (strlen($_POST["firstName"]) < 2) {
+                    $errors[] = "Eesnimi on liiga lühike.";
+                }
+                if (strlen($_POST["lastName"]) < 2) {
+                    $errors[] = "Perekonnanimi on liiga lühike";
+                }
+                if (count($errors) > 0) {
+                    $data['$displayErrors'] = 1;
+                    $data['$errors'] = $errors;
+                    $data['$input'] = [$_POST["firstName"], $_POST["lastName"], $_POST["phone1"],$_POST["phone2"], $_POST["phone3"], $_GET["contactID"]];
+
+                } else { //if didn't find errors - change contact and POST-REDIRECT-GET
+                    $phones = [];
+                    $phones["phone1"] = $_POST["phone1"];
+                    $phones["phone2"] = $_POST["phone2"];
+                    $phones["phone3"] = $_POST["phone3"];
+                    $contact = new Contact($_POST["firstName"], $_POST["lastName"], $phones, $_GET["contactID"]);
+                    edit_contact($contact);
+                    header('Location: ?cmd=listPage');
+                }
+            } else { // Receiving get request - just display contact info in textfields
+                $input = [$person->firstName, $person->lastName];
+                $input[] = count($person->phones) >= 1 ? $person->phones[0] : "";
+                $input[] = count($person->phones) >= 2 ? $person->phones[1] : "";
+                $input[] = count($person->phones) >= 3 ? $person->phones[2] : "";
+                $input[] = $_GET["contactID"];
+                $data['$input'] = $input;
+            }
+        } else { // If person is not in database
+            header('Location: ?cmd=listPage&error=1');
+        }
+    }
+    else { // If contactID GET parameter is set
+        header('Location: ?cmd=listPage&error=2');
+    }
+}
+
+else {
     header('Location: ?cmd=listPage');
 }
 $data['$contacts'] = read_all_contacts_sql();
