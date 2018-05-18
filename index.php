@@ -10,7 +10,7 @@ if ($cmd === "listPage") {
     if (isset($_GET["error"])) {
         $data['$displayErrors'] = 1;
         if ($_GET["error"] === "1") $data['$errors'] = ["Isikut ei leitud andmebaasist"];
-        if ($_GET["error"] === "2") $data['$errors'] = ["Isikut ID parameetrit ei leitud URList"];
+        if ($_GET["error"] === "2") $data['$errors'] = ["Isiku ID parameetrit ei leitud URList"];
     }
 } else if ($cmd === "addPage") {
     $data['$displayAddPage'] = 1;
